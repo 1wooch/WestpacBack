@@ -50,6 +50,44 @@ router.get('/api/JBscrape', async (req, res) => {
   }
 });
 
+router.get('/api/AMZscrape', async (req, res) => {
+  const { url } = req.query;
+
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required' });
+  }
+
+  try {
+    const response = await axios.get(url);
+    const html = response.data;
+
+    const $ = cheerio.load(html);
+
+    
+
+
+    const priceElement = $('.aok-offscreen');// -> work
+    const price = priceElement.text().trim();
+    const title = $('#productTitle').text().trim(); 
+    const imgElement = $('#landingImage');
+    const alt = imgElement.attr('alt');
+    const src = imgElement.attr('src');
+
+   
+    //res.status(200).json({price,title}); only return title???
+    if (price ) {
+      
+
+      res.status(200).json({price,title,alt,src}); //only return price???? -> nvm works
+
+    } else {
+      res.status(404).json({ error: 'Price meta element not found on the page' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to scrape data from the URL' });
+  }
+});
 
 
 
